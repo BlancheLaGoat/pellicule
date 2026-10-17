@@ -29,6 +29,7 @@ Pellicule fait tourner le **site officiel** de chaque plateforme dans une appli 
 - **YouTube sans pubs** : quand une pub démarre, Pellicule coupe le son, la passe en accéléré et clique sur « Passer » dès qu'il apparaît ; les bannières et encarts pub sont masqués.
 - **Twitch sans pubs** : script *vaft* de [TwitchAdSolutions](https://github.com/pixeltris/TwitchAdSolutions) (MIT), qui cherche un flux sans pub. Projet archivé par son auteur en mars 2026 : s'il ne suffit plus, menu de l'icône → *Pubs Twitch* → *Couper le son et masquer*.
 - **Mode onglets** (optionnel, menu de l'icône → *Mode onglets*) : plusieurs plateformes ouvertes en même temps, plusieurs onglets YouTube ou Twitch, et chaque onglet peut être **détaché dans sa propre fenêtre** (glisse-le vers le bas) sans recharger la page.
+- **Pause en changeant d'onglet** : la vidéo que tu quittes (autre onglet ou Accueil) se met en pause, pour ne pas avoir le son en fond. Désactivable dans le menu de l'icône.
 - **Retour / Suivant / Actualiser** dans la barre (aussi `Alt + ←/→`, boutons latéraux de la souris, `F5`).
 - **Lecture / pause** depuis la barre et depuis l'aperçu de la barre des tâches Windows ; touches multimédia du clavier.
 - **Fermer la fenêtre met la vidéo en pause** et range Pellicule près de l'horloge (tes connexions restent ouvertes). *Quitter* depuis le menu de l'icône pour la fermer vraiment.

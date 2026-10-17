@@ -248,8 +248,11 @@ class Host {
 
   activate(tab) {
     if (!tab || this.tabs.indexOf(tab) < 0) return;
-    if (this.active && this.active !== tab) this.previous = this.active;
+    const left = this.active && this.active !== tab ? this.active : null;
+    if (left) this.previous = left;
     this.active = tab;
+    // l'onglet qu'on quitte se met en pause (pas de son en fond), sauf si l'option est coupée
+    if (left && left.p && alive(left) && state.pauseOnSwitch !== false) pauseTab(left);
     for (const t of this.tabs) t.view.setVisible(t === tab);
     if (!this.win.isDestroyed()) {
       this.win.setTitle(tab.p ? `${tab.p.name} — Pellicule` : 'Pellicule');
@@ -758,11 +761,12 @@ function toggleWindowFullscreen(host) {
   host.updateBar();
 }
 
-// Met en pause toutes les vidéos (quand on ferme la fenêtre).
+// Met en pause la vidéo d'un onglet / de tous les onglets (quand on ferme la fenêtre).
+function pauseTab(t) {
+  t.view.webContents.executeJavaScript('window.__pellicule && window.__pellicule.state().playing && window.__pellicule.action("pause")', true).catch(() => {});
+}
 function pauseAll() {
-  for (const t of allTabs()) {
-    if (t.p && alive(t)) t.view.webContents.executeJavaScript('window.__pellicule && window.__pellicule.action("pause")', true).catch(() => {});
-  }
+  for (const t of allTabs()) if (t.p && alive(t)) pauseTab(t);
   setTimeout(poll, 300);
 }
 
@@ -943,6 +947,12 @@ function buildTrayMenu() {
         { type: 'separator' },
         { label: 'Accueil', click: () => goHome() },
       ],
+    },
+    {
+      label: 'Pause quand je change d\'onglet',
+      type: 'checkbox',
+      checked: state.pauseOnSwitch !== false,
+      click: item => { state.pauseOnSwitch = item.checked; saveState(); buildTrayMenu(); },
     },
     {
       label: 'Mode onglets',
