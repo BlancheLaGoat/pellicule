@@ -1,7 +1,7 @@
 {
   "name": "pellicule",
   "productName": "Pellicule",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Netflix, Disney+, Prime Video, Viki, YouTube et Twitch dans une appli desktop stable, avec anti-pub YouTube et Twitch.",
   "main": "src/main.js",
   "author": "BlancheLaGoat",
