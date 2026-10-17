@@ -1,0 +1,63 @@
+{
+  "name": "pellicule",
+  "productName": "Pellicule",
+  "version": "1.0.0",
+  "description": "Netflix, Disney+, Prime Video, Viki, YouTube et Twitch dans une appli desktop stable, avec anti-pub YouTube et Twitch.",
+  "main": "src/main.js",
+  "author": "BlancheLaGoat",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --publish never"
+  },
+  "devDependencies": {
+    "electron": "https://github.com/castlabs/electron-releases#v44.5.1+wvcus",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.blanchelagoat.pellicule",
+    "productName": "Pellicule",
+    "electronVersion": "44.5.1",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "afterSign": "./scripts/evs-sign.js",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "electronDownload": {
+      "version": "44.5.1+wvcus",
+      "mirror": "https://github.com/castlabs/electron-releases/releases/download/"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "BlancheLaGoat",
+        "repo": "pellicule"
+      }
+    ]
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9",
+    "@xhayper/discord-rpc": "^1.5.1"
+  }
+}

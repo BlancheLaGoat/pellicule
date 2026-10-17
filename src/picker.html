@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'">
+<title>Pellicule</title>
+<style>
+  :root {
+    --bg: #0b0b0d;
+    --card: #141418;
+    --line: #26262c;
+    --text: #f2f2f4;
+    --muted: #8a8a94;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; }
+  body {
+    background: radial-gradient(1200px 600px at 50% -10%, #1b1b22 0%, var(--bg) 60%);
+    color: var(--text);
+    font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+    display: grid;
+    place-items: center;
+    user-select: none;
+  }
+  main { width: min(920px, 100% - 48px); padding: 48px 0; }
+  header { margin-bottom: 32px; display: flex; align-items: flex-end; gap: 16px; }
+  header .titles { flex: 1; min-width: 0; }
+  .back {
+    all: unset; cursor: pointer; display: none; align-items: center; gap: 8px; white-space: nowrap;
+    height: 36px; padding: 0 14px; border-radius: 10px; font-size: 14px; font-weight: 600;
+    background: #ffffff10; border: 1px solid var(--line); color: var(--text);
+  }
+  .back:hover, .back:focus-visible { background: #ffffff1a; }
+  .back.show { display: inline-flex; }
+  .badge.open { color: #3ddc84; border-color: #3ddc8466; }
+  h1 { font-size: 34px; font-weight: 650; letter-spacing: -0.02em; }
+  header p { color: var(--muted); margin-top: 6px; font-size: 15px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+  }
+  button.card {
+    all: unset;
+    cursor: pointer;
+    position: relative;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 132px;
+    transition: transform .12s ease, border-color .12s ease, background .12s ease;
+  }
+  button.card:hover, button.card:focus-visible {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    background: linear-gradient(160deg, var(--tint) 0%, var(--card) 70%);
+  }
+  .tile {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: grid; place-items: center;
+    font-weight: 700; font-size: 20px;
+    background: var(--tint);
+    color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+  .name { font-size: 17px; font-weight: 600; }
+  .note { font-size: 12.5px; color: var(--muted); line-height: 1.35; }
+  .badge {
+    position: absolute; top: 14px; right: 14px;
+    font-size: 11px; color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    padding: 2px 8px; border-radius: 99px;
+  }
+  footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
+  kbd {
+    font-family: inherit; font-size: 12px;
+    border: 1px solid var(--line); border-bottom-width: 2px;
+    border-radius: 6px; padding: 1px 6px; color: var(--text);
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="titles">
+      <h1>Qu'est-ce qu'on regarde ?</h1>
+      <p>Connecte-toi une fois, Pellicule garde ta session. Tu peux en changer quand tu veux.</p>
+    </div>
+    <button class="back" id="back" title="Échap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+      <span id="backText">Revenir</span>
+    </button>
+  </header>
+  <div class="grid" id="grid"></div>
+  <footer>
+Le bouton <b>Accueil</b> en haut à gauche ramène ici à tout moment (ou <kbd>Ctrl</kbd> + <kbd>Maj</kbd> + <kbd>P</kbd>).
+  </footer>
+</main>
+<script>
+  window.pellicule.platforms().then(({ list, last, open = [], back }) => {
+    if (back) {
+      const b = document.getElementById('back');
+      document.getElementById('backText').textContent = `Revenir à ${back.name}`;
+      b.classList.add('show');
+      b.onclick = () => window.pellicule.back();
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') window.pellicule.back(); });
+    }
+    const grid = document.getElementById('grid');
+    for (const p of list) {
+      const b = document.createElement('button');
+      b.className = 'card';
+      b.style.setProperty('--accent', p.accent);
+      b.style.setProperty('--tint', p.color);
+      b.innerHTML = `
+        <span class="tile"></span>
+        <span class="name"></span>
+        ${p.note ? '<span class="note"></span>' : ''}
+        ${open.includes(p.id) ? '<span class="badge open">Ouvert</span>'
+          : p.id === last ? '<span class="badge">Dernière utilisée</span>' : ''}`;
+      b.querySelector('.tile').textContent = p.name[0];
+      b.querySelector('.name').textContent = p.name;
+      if (p.note) b.querySelector('.note').textContent = p.note;
+      b.addEventListener('click', () => window.pellicule.choose(p.id));
+      grid.appendChild(b);
+    }
+    (grid.querySelector('.badge')?.closest('button') || grid.firstElementChild)?.focus();
+  });
+</script>
+</body>
+</html>

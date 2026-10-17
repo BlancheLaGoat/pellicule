@@ -1,0 +1,54 @@
+name: Build Windows
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write   # nécessaire pour publier la Release
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      EVS_ACCOUNT: ${{ secrets.EVS_ACCOUNT }}
+      EVS_PASSWD: ${{ secrets.EVS_PASSWD }}
+      SKIP_EVS: ${{ secrets.EVS_ACCOUNT == '' && '1' || '0' }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Installer castlabs-evs
+        run: pip install --upgrade castlabs-evs
+
+      - name: Connexion EVS (signature VMP)
+        if: ${{ env.EVS_ACCOUNT != '' }}
+        run: python -m castlabs_evs.account reauth -A "$env:EVS_ACCOUNT" -P "$env:EVS_PASSWD"
+
+      - run: npm ci || npm install
+
+      - run: npm run dist
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: Pellicule-Setup
+          path: |
+            dist/*.exe
+            dist/latest.yml
+
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.exe
+            dist/*.exe.blockmap
+            dist/latest.yml
